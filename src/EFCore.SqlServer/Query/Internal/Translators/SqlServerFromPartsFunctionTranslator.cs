@@ -14,6 +14,12 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 /// </summary>
 public class SqlServerFromPartsFunctionTranslator : IMethodCallTranslator
 {
+    private static readonly MethodInfo DateOnlyToDateTimeMethodInfo = typeof(DateOnly)
+        .GetRuntimeMethod(
+            nameof(DateOnly.ToDateTime),
+            [typeof(TimeOnly)]
+        )!;
+
     private static readonly MethodInfo DateFromPartsMethodInfo = typeof(SqlServerDbFunctionsExtensions)
         .GetRuntimeMethod(
             nameof(SqlServerDbFunctionsExtensions.DateFromParts),
@@ -70,6 +76,7 @@ public class SqlServerFromPartsFunctionTranslator : IMethodCallTranslator
         = new Dictionary<MethodInfo, (string, string)>
         {
             { DateFromPartsMethodInfo, ("DATEFROMPARTS", "date") },
+            { DateOnlyToDateTimeMethodInfo, ("DATETIMEFROMPARTS", "datetime") },
             { DateTimeFromPartsMethodInfo, ("DATETIMEFROMPARTS", "datetime") },
             { DateTime2FromPartsMethodInfo, ("DATETIME2FROMPARTS", "datetime2") },
             { DateTimeOffsetFromPartsMethodInfo, ("DATETIMEOFFSETFROMPARTS", "datetimeoffset") },

@@ -1188,6 +1188,21 @@ WHERE '2018-12-29T23:20:40.0000000+01:00' > DATETIMEOFFSETFROMPARTS(DATEPART(yea
     }
 
     [ConditionalFact]
+    public virtual void DateOnlyToDateTime_compare_with_local_variable()
+    {
+        var dateOnly = new DateOnly(1919, 12, 29);
+        using var context = CreateContext();
+
+        var count = context.Orders
+            .Count(
+                c => dateOnly.ToDateTime(new TimeOnly())
+                    > EF.Functions.DateTimeFromParts(
+                        DateTime.Now.Year, dateOnly.Month, dateOnly.Day, 0, 0, 0, 0));
+
+        Assert.Equal(0, count);
+    }
+
+    [ConditionalFact]
     public virtual void DateTimeOffsetFromParts_compare_with_local_variable()
     {
         var dateTimeOffset = new DateTimeOffset(1919, 12, 12, 10, 20, 15, new TimeSpan(1, 30, 0));
