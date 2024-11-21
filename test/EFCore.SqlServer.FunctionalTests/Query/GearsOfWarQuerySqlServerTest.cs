@@ -9078,6 +9078,33 @@ WHERE DATEPART(month, [m].[Date]) = 11
 """);
     }
 
+    [ConditionalTheory]
+    [MemberData(nameof(IsAsyncData))]
+    public virtual async Task Where_DateOnly_ToDateTime(bool async)
+    {
+        // todo: without the "where m.Id == 1" this fails with the error "Cannot construct data type datetime, some of the arguments have values which are not valid."
+
+        await AssertQuery(
+            async,
+            ss =>
+            {
+                var expected = new DateTime(2020, 1, 1, 15, 30, 10);
+
+                return ss.Set<Mission>()
+                    .Where(m => m.Id == 1 && m.Date.ToDateTime(m.Time) == expected)
+                    .AsTracking();
+            }
+        );
+
+        AssertSql("""
+@__expected_0='2020-01-01T15:30:10.0000000' (DbType = DateTime)
+
+SELECT [m].[Id], [m].[BriefingDocument], [m].[BriefingDocumentFileExtension], [m].[CodeName], [m].[Date], [m].[Difficulty], [m].[Duration], [m].[Rating], [m].[Time], [m].[Timeline]
+FROM [Missions] AS [m]
+WHERE [m].[Id] = 1 AND DATETIMEFROMPARTS(DATEPART(year, [m].[Date]), DATEPART(month, [m].[Date]), DATEPART(day, [m].[Date]), DATEPART(hour, [m].[Time]), DATEPART(minute, [m].[Time]), DATEPART(second, [m].[Time]), DATEPART(millisecond, [m].[Time])) = @__expected_0
+""");
+    }
+
     public override async Task Where_DateOnly_Day(bool async)
     {
         await base.Where_DateOnly_Day(async);
