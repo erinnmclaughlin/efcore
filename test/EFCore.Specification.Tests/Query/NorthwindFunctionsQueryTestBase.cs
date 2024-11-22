@@ -1688,6 +1688,24 @@ public abstract class NorthwindFunctionsQueryTestBase<TFixture>(TFixture fixture
 
     [ConditionalTheory]
     [MemberData(nameof(IsAsyncData))]
+    public virtual async Task Convert_ToDateTime(bool async)
+    {
+        var convertMethods = new List<Expression<Func<Order, bool>>>
+        {
+            o => Convert.ToDateTime(o.OrderDate.ToString()) == new DateTime(1997, 10, 3)
+        };
+
+        foreach (var convertMethod in convertMethods)
+        {
+            await AssertQuery(
+                async,
+                ss => ss.Set<Order>().Where(o => o.CustomerID == "ALFKI").Where(convertMethod)
+            );
+        }
+    }
+
+    [ConditionalTheory]
+    [MemberData(nameof(IsAsyncData))]
     public virtual Task Indexof_with_emptystring(bool async)
         => AssertQuery(
             async,

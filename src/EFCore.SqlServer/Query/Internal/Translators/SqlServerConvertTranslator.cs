@@ -23,7 +23,8 @@ public class SqlServerConvertTranslator : IMethodCallTranslator
         [nameof(Convert.ToInt16)] = "smallint",
         [nameof(Convert.ToInt32)] = "int",
         [nameof(Convert.ToInt64)] = "bigint",
-        [nameof(Convert.ToString)] = "nvarchar(max)"
+        [nameof(Convert.ToString)] = "nvarchar(max)",
+        [nameof(Convert.ToDateTime)] = "datetime2"
     };
 
     private static readonly List<Type> SupportedTypes =
@@ -72,12 +73,23 @@ public class SqlServerConvertTranslator : IMethodCallTranslator
         MethodInfo method,
         IReadOnlyList<SqlExpression> arguments,
         IDiagnosticsLogger<DbLoggerCategory.Query> logger)
-        => SupportedMethods.Contains(method)
-            ? _sqlExpressionFactory.Function(
-                "CONVERT",
-                [_sqlExpressionFactory.Fragment(TypeMapping[method.Name]), arguments[0]],
-                nullable: true,
-                argumentsPropagateNullability: Statics.FalseTrue,
-                method.ReturnType)
-            : null;
+    {
+        if (!SupportedMethods.Contains(method))
+        {
+            return null;
+        }
+
+        if (method.Name == nameof(Convert.ToDateTime) && arguments[0].Type != typeof(string))
+        {
+            return null;
+        }
+
+        return _sqlExpressionFactory.Function(
+            "CONVERT",
+            [_sqlExpressionFactory.Fragment(TypeMapping[method.Name]), arguments[0]],
+            nullable: true,
+            argumentsPropagateNullability: Statics.FalseTrue,
+            method.ReturnType
+        );
+    }
 }
