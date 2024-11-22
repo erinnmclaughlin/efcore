@@ -2318,10 +2318,16 @@ WHERE [o].[CustomerID] = N'ALFKI' AND (CONVERT(nvarchar(max), [o].[OrderDate]) L
     public override async Task Convert_ToDateTime(bool async)
     {
         await base.Convert_ToDateTime(async);
-        AssertSql("""
+        AssertSql(
+            """
 SELECT [o].[OrderID], [o].[CustomerID], [o].[EmployeeID], [o].[OrderDate]
 FROM [Orders] AS [o]
-WHERE [o].[CustomerID] = N'ALFKI' AND CONVERT(datetime2, COALESCE(CONVERT(varchar(100), [o].[OrderDate]), '')) = '1997-10-03T00:00:00.0000000'
+WHERE [o].[CustomerID] = N'ALFKI' AND CONVERT(datetime2, CONVERT(nvarchar(max), [o].[OrderDate])) = '1997-10-03T00:00:00.0000000'
+""",
+            """
+SELECT [o].[OrderID], [o].[CustomerID], [o].[EmployeeID], [o].[OrderDate]
+FROM [Orders] AS [o]
+WHERE [o].[CustomerID] = N'ALFKI' AND CONVERT(datetime2, CAST([o].[OrderDate] AS nvarchar(max))) = '1997-10-03T00:00:00.0000000'
 """);
     }
 

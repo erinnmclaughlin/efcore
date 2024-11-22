@@ -79,14 +79,16 @@ public class SqlServerConvertTranslator : IMethodCallTranslator
             return null;
         }
 
+        var toConvert = arguments[0];
+
         if (method.Name == nameof(Convert.ToDateTime) && arguments[0].Type != typeof(string))
         {
-            return null;
+            toConvert = _sqlExpressionFactory.Convert(arguments[0], typeof(string));
         }
 
         return _sqlExpressionFactory.Function(
             "CONVERT",
-            [_sqlExpressionFactory.Fragment(TypeMapping[method.Name]), arguments[0]],
+            [_sqlExpressionFactory.Fragment(TypeMapping[method.Name]), toConvert],
             nullable: true,
             argumentsPropagateNullability: Statics.FalseTrue,
             method.ReturnType
