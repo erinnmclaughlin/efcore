@@ -2328,6 +2328,11 @@ WHERE [o].[CustomerID] = N'ALFKI' AND CONVERT(datetime2, CONVERT(nvarchar(max), 
 SELECT [o].[OrderID], [o].[CustomerID], [o].[EmployeeID], [o].[OrderDate]
 FROM [Orders] AS [o]
 WHERE [o].[CustomerID] = N'ALFKI' AND CONVERT(datetime2, CAST([o].[OrderDate] AS nvarchar(max))) = '1997-10-03T00:00:00.0000000'
+""",
+            """
+SELECT [o].[OrderID], [o].[CustomerID], [o].[EmployeeID], [o].[OrderDate]
+FROM [Orders] AS [o]
+WHERE [o].[CustomerID] = N'ALFKI' AND CONVERT(datetime2, CAST(CONVERT(nvarchar(max), [o].[OrderDate]) AS nvarchar(max))) = '1997-10-03T00:00:00.0000000'
 """);
     }
 
