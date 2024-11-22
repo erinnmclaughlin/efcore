@@ -1693,8 +1693,8 @@ public abstract class NorthwindFunctionsQueryTestBase<TFixture>(TFixture fixture
         var convertMethods = new List<Expression<Func<Order, bool>>>
         {
             o => Convert.ToDateTime(Convert.ToString(o.OrderDate)) == new DateTime(1997, 10, 3),
-            o => Convert.ToDateTime(o.OrderDate) == new DateTime(1997, 10, 3),
-            o => Convert.ToDateTime((object)Convert.ToString(o.OrderDate)) == new DateTime(1997, 10, 3),
+            o => Convert.ToDateTime(o.OrderDate.Value) == new DateTime(1997, 10, 3),
+            o => Convert.ToDateTime((object)Convert.ToString(o.OrderDate)) == new DateTime(1997, 10, 3)
         };
 
         foreach (var convertMethod in convertMethods)
