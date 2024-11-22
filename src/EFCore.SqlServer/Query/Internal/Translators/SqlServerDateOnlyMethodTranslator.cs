@@ -77,13 +77,14 @@ public class SqlServerDateOnlyMethodTranslator : IMethodCallTranslator
                 var hourPart = DatePart("hour", arguments[0], typeof(int));
                 var minutePart = DatePart("minute", arguments[0], typeof(int));
                 var secondPart = DatePart("second", arguments[0], typeof(int));
-                var millisecondPart = DatePart("millisecond", arguments[0], typeof(int));
+                var fractionsPart = _sqlExpressionFactory.Constant(0, typeof(int));
+                var precisionPart = _sqlExpressionFactory.Constant(0, typeof(int));
 
                 var func = _sqlExpressionFactory.Function(
-                    "DATETIMEFROMPARTS",
-                    new[] { yearPart, monthPart, dayPart, hourPart, minutePart, secondPart, millisecondPart },
+                    "DATETIME2FROMPARTS",
+                    new[] { yearPart, monthPart, dayPart, hourPart, minutePart, secondPart, fractionsPart, precisionPart },
                     nullable: true,
-                    argumentsPropagateNullability: new[] { true, true, true, true, true, true, true },
+                    argumentsPropagateNullability: new[] { true, true, true, true, true, true, true, true },
                     method.ReturnType,
                     _typeMappingSource.FindMapping(method.ReturnType, "datetime")
                 );
